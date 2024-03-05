@@ -330,7 +330,7 @@ def search_rank(q: str = ""):
         return [], []  # no query? no results
     n_pids = len(get_pids())
     chunk_size = 20000
-    n_process = min(cpu_count() // 2, n_pids // chunk_size)
+    n_process = max(1, min(cpu_count() // 2, n_pids // chunk_size))
     with Pool(n_process) as pool:
         sub_pairs_list = pool.starmap(
             count_match,

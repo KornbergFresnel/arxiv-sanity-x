@@ -10,10 +10,13 @@ import random
 import logging
 import tqdm
 import argparse
+import os
 
 from aslite.arxiv import get_response, parse_response
 from aslite.db import get_papers_db, get_metas_db
-import os
+
+import settings
+import vars
 
 
 if __name__ == "__main__":
@@ -58,14 +61,8 @@ if __name__ == "__main__":
     we've reached older papers that are already part of the database, to spare the arxiv API.
     """
 
-    # query string of papers to look for
-    q = "cat:cs.CV+OR+cat:cs.CL+OR+cat:cs.LG+OR+cat:cs.AI+OR+cat:cs.NE+OR+cat:cs.RO+OR+cat:stat.ML+OR+cat:cs.GT+OR+cat:cs.HC+OR+cat:cs.MA"
-    # 20000
-    # q = "cat:cs.CV+OR+cat:cs.CL+OR+cat:cs.RO"
-    # 50000
-    # q = "cat:cs.LG+OR+cat:cs.AI+OR+cat:stat.ML"
-    # 10000
-    # q = "cat:cs.NE+OR+cat:cs.GT+OR+cat:cs.HC+OR+cat:cs.MA"
+    # parse categories from settings
+    q = "+OR+".join(map(lambda x: f"cat:{x}", settings.CATEGORIES))
 
     if args.init:
         keywords = [
@@ -80,6 +77,10 @@ if __name__ == "__main__":
         q_lst = [q]
     # example
     # https://export.arxiv.org/api/query?search_query=(cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.AI+OR+Large%20Language%20Model)&start=0&max_results=100
+        
+    # check whether DATA_DIR exists
+    if not os.path.exists(vars.DATA_DIR):
+        os.mkdir(vars.DATA_DIR)
 
     total_updated = 0
     for q_each in q_lst:
